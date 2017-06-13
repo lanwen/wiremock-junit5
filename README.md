@@ -1,6 +1,7 @@
 # Wiremock JUnit5
 
 [![codecov](https://codecov.io/gh/lanwen/wiremock-junit5/branch/master/graph/badge.svg)](https://codecov.io/gh/lanwen/wiremock-junit5)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ru.lanwen.wiremock/wiremock-junit5/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/ru.lanwen.wiremock/wiremock-junit5)
 
 Simple extension to inject ready-to-use wiremock server to JUnit5 test
 

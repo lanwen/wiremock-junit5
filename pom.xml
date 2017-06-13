@@ -7,6 +7,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <url>https://github.com/lanwen/wiremock-junit5</url>
     <name>wiremock-junit5-root</name>
     <description>Wiremock JUnit5 Extension</description>
 
