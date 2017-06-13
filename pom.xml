@@ -213,7 +213,7 @@
                         </execution>
                         <execution>
                             <id>jacoco-report-tests</id>
-                            <phase>site</phase>
+                            <phase>test</phase>
                             <goals>
                                 <goal>report</goal>
                             </goals>
