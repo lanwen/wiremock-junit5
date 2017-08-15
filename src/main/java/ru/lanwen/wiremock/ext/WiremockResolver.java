@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExtensionContext;
 import ru.lanwen.wiremock.config.WiremockConfigFactory;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
 
@@ -30,7 +29,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     private WireMockServer server;
 
     @Override
-    public void afterEach(TestExtensionContext testExtensionContext) throws Exception {
+    public void afterEach(ExtensionContext testExtensionContext) throws Exception {
         if (server == null || !server.isRunning()) {
             return;
         }
@@ -42,12 +41,12 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     }
 
     @Override
-    public boolean supports(ParameterContext parameterContext, ExtensionContext context) {
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) {
         return parameterContext.getParameter().isAnnotationPresent(Wiremock.class);
     }
 
     @Override
-    public Object resolve(ParameterContext parameterContext, ExtensionContext context) {
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext context) {
         Validate.validState(
                 !Optional.ofNullable(server).map(WireMockServer::isRunning).orElse(false),
                 "Can't inject more than one server"
