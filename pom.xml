@@ -42,8 +42,8 @@
         <lombok.version>1.16.16</lombok.version>
         <logback.version>1.1.11</logback.version>
         <jacoco.version>0.7.7.201606060606</jacoco.version>
-        <junit.jupiter.version>5.0.0-M4</junit.jupiter.version>
-        <junit.platform.version>1.0.0-M4</junit.platform.version>
+        <junit.jupiter.version>5.0.0-RC2</junit.jupiter.version>
+        <junit.platform.version>1.0.0-RC2</junit.platform.version>
     </properties>
 
     <dependencyManagement>

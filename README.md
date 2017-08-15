@@ -41,3 +41,8 @@ With `ru.lanwen.wiremock.config.WiremockCustomizer` and `ru.lanwen.wiremock.conf
 you can reuse logic of initial setup.
 
 Please look into test for example.
+
+## Compatibility with JUnit5
+
+*v1.0.1* `->` *M4*
+*v1.1.0* `->` *RC2*

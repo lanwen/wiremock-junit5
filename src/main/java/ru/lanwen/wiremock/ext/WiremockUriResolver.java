@@ -15,13 +15,13 @@ import java.lang.annotation.Target;
  */
 public class WiremockUriResolver implements ParameterResolver {
     @Override
-    public boolean supports(ParameterContext parameterContext, ExtensionContext extensionContext) {
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
         return parameterContext.getParameter().isAnnotationPresent(WiremockUri.class)
                 && String.class.isAssignableFrom(parameterContext.getParameter().getType());
     }
 
     @Override
-    public Object resolve(ParameterContext parameterContext, ExtensionContext context) {
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext context) {
         ExtensionContext.Store store = context.getStore(ExtensionContext.Namespace.create(WiremockResolver.class));
 
         return "http://localhost:" + store.get(WiremockResolver.WIREMOCK_PORT);
