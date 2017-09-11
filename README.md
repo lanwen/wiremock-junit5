@@ -44,5 +44,6 @@ Please look into test for example.
 
 ## Compatibility with JUnit5
 
-*v1.0.1* `->` *M4*
-*v1.1.0* `->` *RC2*
+- *v1.0.1* `->` *M4*
+- *v1.1.0* `->` *RC2*
+- *v1.1.1* `->` *GA*
