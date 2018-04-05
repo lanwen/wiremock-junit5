@@ -69,7 +69,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
         server.start();
 
         try {
-            mockedServer.customizer().newInstance().customize(server);
+            mockedServer.customizer().newInstance().customize(server, context);
         } catch (ReflectiveOperationException e) {
             throw new ParameterResolutionException(
                     format("Can't customize server with given customizer %s", mockedServer.customizer()),

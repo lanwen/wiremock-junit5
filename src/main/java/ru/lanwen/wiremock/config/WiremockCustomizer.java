@@ -1,6 +1,7 @@
 package ru.lanwen.wiremock.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 
 
@@ -12,11 +13,11 @@ import ru.lanwen.wiremock.ext.WiremockResolver;
  */
 public interface WiremockCustomizer {
 
-    void customize(final WireMockServer server);
+    void customize(WireMockServer server, ExtensionContext context);
 
     class NoopWiremockCustomizer implements WiremockCustomizer {
         @Override
-        public void customize(final WireMockServer server) {
+        public void customize(final WireMockServer server, final ExtensionContext context) {
             // noop
         }
     }
