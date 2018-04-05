@@ -1,7 +1,6 @@
 package ru.lanwen.wiremock.config;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ru.lanwen.wiremock.config.WiremockCustomizer.NoopWiremockCustomizer;
 
 import static org.mockito.Mockito.mock;
