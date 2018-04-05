@@ -115,7 +115,6 @@ public class WiremockResolverUnitTest {
             resolver.resolveParameter(parameterContext, extensionContext);
             fail("Exception expected");
         } catch (final ParameterResolutionException e) {
-            assertEquals("Can't customize server with given customizer @ru.lanwen.wiremock.ext.WiremockResolver$Wiremock(factory=class ru.lanwen.wiremock.config.WiremockConfigFactory$DefaultWiremockConfigFactory, customizer=class ru.lanwen.wiremock.config.WiremockCustomizer$NoopWiremockCustomizer)", e.getMessage());
             assertSame(expected, e.getCause());
         }
     }
