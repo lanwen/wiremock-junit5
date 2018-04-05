@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 
 /**
- * You can create custom config to init wiremock server in test.
+ * You can createServer custom config to init wiremock server in test.
  *
  * @author lanwen (Merkushev Kirill)
  * @see WiremockResolver.Wiremock

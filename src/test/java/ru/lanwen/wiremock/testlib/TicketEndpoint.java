@@ -2,6 +2,7 @@ package ru.lanwen.wiremock.testlib;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import ru.lanwen.wiremock.config.Customizable;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
 
 import java.util.UUID;
@@ -21,7 +22,9 @@ public class TicketEndpoint implements WiremockCustomizer {
     public static final String X_TEST_METHOD_NAME_HEADER = "X-TestMethodName";
 
     @Override
-    public void customize(WireMockServer server, ExtensionContext context) {
+    public void customize(Customizable customizable) {
+        WireMockServer server = customizable.getServer();
+        ExtensionContext context = customizable.getExtensionContext();
         String uuid = UUID.randomUUID().toString();
         String testMethodName = context.getTestMethod().get().getName();
 
