@@ -26,7 +26,16 @@ import static java.lang.String.format;
 public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     static final String WIREMOCK_PORT = "wiremock.port";
 
+    private final WiremockFactory wiremockFactory;
     private WireMockServer server;
+
+    public WiremockResolver() {
+        this(new WiremockFactory());
+    }
+
+    WiremockResolver(final WiremockFactory wiremockFactory) {
+        this.wiremockFactory = wiremockFactory;
+    }
 
     @Override
     public void afterEach(ExtensionContext testExtensionContext) throws Exception {
@@ -54,25 +63,19 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
 
         Wiremock mockedServer = parameterContext.getParameter().getAnnotation(Wiremock.class);
 
-
-        try {
-            server = new WireMockServer(
-                    mockedServer.factory().newInstance().create()
-            );
-        } catch (ReflectiveOperationException e) {
-            throw new ParameterResolutionException(
-                    format("Can't create config with given factory %s", mockedServer.factory()),
-                    e
-            );
-        }
-
+        server = wiremockFactory.createServer(mockedServer);
         server.start();
 
+        DefaultCustomizable customizable = wiremockFactory.createCustomizable();
+        customizable.setServer(server);
+        customizable.setParameterContext(parameterContext);
+        customizable.setExtensionContext(context);
+
         try {
-            mockedServer.customizer().newInstance().customize(server);
-        } catch (ReflectiveOperationException e) {
+            wiremockFactory.createCustomizer(mockedServer).customize(customizable);
+        } catch (final Exception e) {
             throw new ParameterResolutionException(
-                    format("Can't customize server with given customizer %s", mockedServer.customizer()),
+                    format("Can't customize server with given customizer %s", mockedServer),
                     e
             );
         }
@@ -92,7 +95,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Wiremock {
         /**
-         * @return class which defines on how to create config
+         * @return class which defines on how to createServer config
          */
         Class<? extends WiremockConfigFactory> factory() default WiremockConfigFactory.DefaultWiremockConfigFactory.class;
 
