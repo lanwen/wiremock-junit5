@@ -11,7 +11,7 @@ import ru.lanwen.wiremock.ext.WiremockResolver;
  */
 public interface WiremockCustomizer {
 
-    void customize(Customizable customizable);
+    void customize(Customizable customizable) throws Exception;
 
     class NoopWiremockCustomizer implements WiremockCustomizer {
         @Override

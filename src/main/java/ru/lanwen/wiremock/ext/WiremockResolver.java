@@ -71,7 +71,14 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
         customizable.setParameterContext(parameterContext);
         customizable.setExtensionContext(context);
 
-        wiremockFactory.createCustomizer(mockedServer).customize(customizable);
+        try {
+            wiremockFactory.createCustomizer(mockedServer).customize(customizable);
+        } catch (final Exception e) {
+            throw new ParameterResolutionException(
+                    format("Can't customize server with given customizer %s", mockedServer),
+                    e
+            );
+        }
 
         ExtensionContext.Store store = context.getStore(Namespace.create(WiremockResolver.class));
         store.put(WIREMOCK_PORT, server.port());

@@ -1,22 +1,27 @@
 package ru.lanwen.wiremock.ext;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.mockito.InOrder;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import java.lang.reflect.Parameter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.create;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -103,7 +108,20 @@ public class WiremockResolverUnitTest {
     }
 
     @Test
-    public void resolveParameter() {
+    public void resolveParameterFailed() throws Exception {
+        final Exception expected = new Exception();
+        doThrow(expected).when(customizer).customize(customizable);
+        try {
+            resolver.resolveParameter(parameterContext, extensionContext);
+            fail("Exception expected");
+        } catch (final ParameterResolutionException e) {
+            assertEquals("Can't customize server with given customizer @ru.lanwen.wiremock.ext.WiremockResolver$Wiremock(factory=class ru.lanwen.wiremock.config.WiremockConfigFactory$DefaultWiremockConfigFactory, customizer=class ru.lanwen.wiremock.config.WiremockCustomizer$NoopWiremockCustomizer)", e.getMessage());
+            assertSame(expected, e.getCause());
+        }
+    }
+
+    @Test
+    public void resolveParameter() throws Exception {
         assertSame(server, resolver.resolveParameter(parameterContext, extensionContext));
         final InOrder order = inOrder(server, customizable, customizer, extensionContext, store);
         order.verify(server).start();
