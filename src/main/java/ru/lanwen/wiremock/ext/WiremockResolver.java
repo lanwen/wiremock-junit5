@@ -77,7 +77,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
             wiremockFactory.createCustomizer(mockedServer).customize(server, customizationContext);
         } catch (Exception e) {
             throw new ParameterResolutionException(
-                    format("Can't customize server with given customizer %s", mockedServer),
+                    format("Can't customize server with given customizer %s", mockedServer.customizer()),
                     e
             );
         }
