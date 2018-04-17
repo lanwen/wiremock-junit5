@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
 /**
  * You can create custom config to init wiremock server in test.
  *
@@ -26,7 +28,7 @@ public interface WiremockConfigFactory {
 
         @Override
         public WireMockConfiguration create() {
-            return WireMockConfiguration.options().dynamicPort().notifier(new Slf4jNotifier(true));
+            return options().dynamicPort().notifier(new Slf4jNotifier(true));
         }
     }
 }
