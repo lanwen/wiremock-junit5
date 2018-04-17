@@ -79,7 +79,7 @@ public class WiremockFactoryTest {
             factory.createServer(mockedServer);
             fail("Exception expected here");
         } catch (final ParameterResolutionException expected) {
-            assertEquals("Can't createServer config with given factory class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed", expected.getMessage());
+            assertEquals("Can't create config with given factory class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed", expected.getMessage());
         }
     }
 
