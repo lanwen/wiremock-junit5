@@ -3,12 +3,12 @@ package ru.lanwen.wiremock.ext;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.CustomizationContext.CustomizationContextBuilder;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
@@ -20,33 +20,33 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.create;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static ru.lanwen.wiremock.ext.WiremockResolver.WIREMOCK_PORT;
 
 /**
  * @author SourcePond (Roland Hauser)
  */
+@ExtendWith(MockitoExtension.class)
 public class WiremockResolverUnitTest {
-    private static final int EXPECTED_PORT = 8088;
-    private WiremockFactory wiremockFactory = mock(WiremockFactory.class);
-    private WireMockServer server = mock(WireMockServer.class);
-    private CustomizationContextBuilder customizationContextBuilder = mock(CustomizationContextBuilder.class);
-    private CustomizationContext customizationContext = mock(CustomizationContext.class);
-    private WiremockCustomizer customizer = mock(WiremockCustomizer.class);
-    private ExtensionContext extensionContext = mock(ExtensionContext.class);
-    private ParameterContext parameterContext = mock(ParameterContext.class);
-    private Namespace namespace = create(WiremockResolver.class);
-    private Store store = mock(Store.class);
-    private WiremockResolver resolver = new WiremockResolver(wiremockFactory);
+    @Mock
+    private WiremockFactory wiremockFactory;
+    @Mock
+    private WireMockServer server;
+    @Mock
+    private CustomizationContextBuilder customizationContextBuilder;
+    @Mock
+    private CustomizationContext customizationContext;
+    @Mock
+    private WiremockCustomizer customizer;
+    @Mock
+    private ExtensionContext extensionContext;
+    @Mock
+    private ParameterContext parameterContext;
+    @Mock
     private Wiremock mockedServer;
     private Parameter serverParameter;
+    private WiremockResolver resolver;
 
     private void supportedMethod(@Wiremock WireMockServer server) {
 
@@ -60,16 +60,7 @@ public class WiremockResolverUnitTest {
     public void setup() throws Exception {
         serverParameter = getClass().getDeclaredMethod("supportedMethod", WireMockServer.class).getParameters()[0];
         mockedServer = serverParameter.getAnnotation(Wiremock.class);
-        when(wiremockFactory.createServer(mockedServer)).thenReturn(server);
-        when(wiremockFactory.createContextBuilder()).thenReturn(customizationContextBuilder);
-        when(wiremockFactory.createCustomizer(mockedServer)).thenReturn(customizer);
-        when(customizationContextBuilder.extensionContext(extensionContext)).thenReturn(customizationContextBuilder);
-        when(customizationContextBuilder.parameterContext(parameterContext)).thenReturn(customizationContextBuilder);
-        when(customizationContextBuilder.build()).thenReturn(customizationContext);
-        when(server.isRunning()).thenReturn(true);
-        when(server.port()).thenReturn(EXPECTED_PORT);
-        when(parameterContext.getParameter()).thenReturn(serverParameter);
-        when(extensionContext.getStore(namespace)).thenReturn(store);
+        resolver = new WiremockResolver(wiremockFactory);
     }
 
     @Test
@@ -84,27 +75,11 @@ public class WiremockResolverUnitTest {
         verifyZeroInteractions(extensionContext);
     }
 
-    @Test
-    public void afterEachServerIsNotRunning() throws Exception {
-        resolver.resolveParameter(parameterContext, extensionContext);
-        when(server.isRunning()).thenReturn(false);
-        resolver.afterEach(extensionContext);
-        verify(extensionContext).getStore(namespace);
-        verifyNoMoreInteractions(extensionContext);
-    }
-
-    @Test
-    public void afterEach() throws Exception {
-        resolver.resolveParameter(parameterContext, extensionContext);
-        resolver.afterEach(extensionContext);
-        final InOrder order = inOrder(server);
-        order.verify(server).resetRequests();
-        order.verify(server).resetToDefaultMappings();
-        order.verify(server).stop();
-    }
 
     @Test
     public void supportsParameter() throws Exception {
+        when(parameterContext.getParameter()).thenReturn(serverParameter);
+
         assertTrue(resolver.supportsParameter(parameterContext, extensionContext));
         serverParameter = getClass().getDeclaredMethod("unsupportedMethod", WireMockServer.class).getParameters()[0];
         when(parameterContext.getParameter()).thenReturn(serverParameter);
@@ -113,6 +88,14 @@ public class WiremockResolverUnitTest {
 
     @Test
     public void resolveParameterFailed() throws Exception {
+        when(wiremockFactory.createServer(mockedServer)).thenReturn(server);
+        when(wiremockFactory.createContextBuilder()).thenReturn(customizationContextBuilder);
+        when(wiremockFactory.createCustomizer(mockedServer)).thenReturn(customizer);
+        when(customizationContextBuilder.extensionContext(extensionContext)).thenReturn(customizationContextBuilder);
+        when(customizationContextBuilder.parameterContext(parameterContext)).thenReturn(customizationContextBuilder);
+        when(customizationContextBuilder.build()).thenReturn(customizationContext);
+        when(parameterContext.getParameter()).thenReturn(serverParameter);
+
         final Exception expected = new Exception();
         doThrow(expected).when(customizer).customize(server, customizationContext);
         try {
@@ -121,15 +104,5 @@ public class WiremockResolverUnitTest {
         } catch (final ParameterResolutionException e) {
             assertSame(expected, e.getCause());
         }
-    }
-
-    @Test
-    public void resolveParameter() throws Exception {
-        assertSame(server, resolver.resolveParameter(parameterContext, extensionContext));
-        final InOrder order = inOrder(server, customizer, extensionContext, store);
-        order.verify(server).start();
-        order.verify(customizer).customize(server, customizationContext);
-        order.verify(extensionContext).getStore(namespace);
-        order.verify(store).put(WIREMOCK_PORT, EXPECTED_PORT);
     }
 }

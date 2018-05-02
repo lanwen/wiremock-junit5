@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import ru.lanwen.wiremock.config.CustomizationContext;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static ru.lanwen.wiremock.config.CustomizationContext.builder;
 
@@ -32,6 +33,9 @@ public class CustomizationContextTest {
 
     @Test
     public void verifyToString() {
-        System.out.println(customizationContext.toString());
+        final String toString = customizationContext.toString();
+        assertTrue(toString.contains(CustomizationContext.class.getSimpleName()));
+        assertTrue(toString.contains("extensionContext"));
+        assertTrue(toString.contains("parameterContext"));
     }
 }

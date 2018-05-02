@@ -11,11 +11,10 @@ import ru.lanwen.wiremock.config.WiremockCustomizer;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,13 +73,9 @@ public class WiremockFactoryTest {
     @Test
     public void configFactoryCouldNotBeInstantiated() {
         when(mockedServer.factory()).thenReturn((Class) PrivateClassNotAllowed.class);
-
-        try {
-            factory.createServer(mockedServer);
-            fail("Exception expected here");
-        } catch (final ParameterResolutionException expected) {
-            assertEquals("Can't create config with given factory class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed", expected.getMessage());
-        }
+        assertThrows(ParameterResolutionException.class,
+                () -> factory.createServer(mockedServer),
+                "Can't create config with given factory class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed");
     }
 
     @Test
@@ -104,12 +99,8 @@ public class WiremockFactoryTest {
     @Test
     public void customizerCouldNotBeInstantiated() {
         when(mockedServer.customizer()).thenReturn((Class) PrivateClassNotAllowed.class);
-
-        try {
-            factory.createCustomizer(mockedServer);
-            fail("Exception expected here");
-        } catch (final ParameterResolutionException expected) {
-            assertEquals("Can't customize server with given customizer class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed", expected.getMessage());
-        }
+        assertThrows(ParameterResolutionException.class,
+                () -> factory.createCustomizer(mockedServer),
+                "Can't customize server with given customizer class ru.lanwen.wiremock.ext.WiremockFactoryTest$PrivateClassNotAllowed");
     }
 }

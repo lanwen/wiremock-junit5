@@ -1,14 +1,11 @@
 package ru.lanwen.wiremock.ext;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static ru.lanwen.wiremock.ext.Validate.validState;
 
 /**
@@ -19,7 +16,7 @@ public class ValidateTest {
 
     @Test
     public void instantiationNotAllowed() {
-        Executable instantiationNotAllowed = () -> {
+        assertThrows(UnsupportedOperationException.class, () -> {
             Constructor<Validate> constructor = Validate.class.getDeclaredConstructor();
             constructor.setAccessible(true);
             try {
@@ -27,20 +24,13 @@ public class ValidateTest {
             } catch (final InvocationTargetException e) {
                 throw e.getTargetException();
             }
-        };
-        assertThrows(UnsupportedOperationException.class, instantiationNotAllowed, "Exception expected");
+        }, "Exception expected");
     }
 
     @Test
     public void verifyValidState() {
         // Should not throw an exception
         validState(true, EXPECTED_MESSAGE);
-
-        try {
-            validState(false, EXPECTED_MESSAGE);
-            fail("Exception expected");
-        } catch (final IllegalStateException e) {
-            assertEquals(EXPECTED_MESSAGE, e.getMessage());
-        }
+        assertThrows(IllegalStateException.class, () -> validState(false, EXPECTED_MESSAGE), EXPECTED_MESSAGE);
     }
 }
