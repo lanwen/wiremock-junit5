@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.WiremockConfigFactory;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
 
@@ -15,9 +16,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static ru.lanwen.wiremock.ext.Validate.validState;
 
 /**
  * @author lanwen (Merkushev Kirill)
@@ -26,7 +28,16 @@ import static java.lang.String.format;
 public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     static final String WIREMOCK_PORT = "wiremock.port";
 
+    private final WiremockFactory wiremockFactory;
     private WireMockServer server;
+
+    public WiremockResolver() {
+        this(new WiremockFactory());
+    }
+
+    WiremockResolver(final WiremockFactory wiremockFactory) {
+        this.wiremockFactory = wiremockFactory;
+    }
 
     @Override
     public void afterEach(ExtensionContext testExtensionContext) throws Exception {
@@ -46,38 +57,32 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     }
 
     @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext context) {
-        Validate.validState(
-                !Optional.ofNullable(server).map(WireMockServer::isRunning).orElse(false),
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        validState(
+                !ofNullable(server).map(WireMockServer::isRunning).orElse(false),
                 "Can't inject more than one server"
         );
 
         Wiremock mockedServer = parameterContext.getParameter().getAnnotation(Wiremock.class);
 
-
-        try {
-            server = new WireMockServer(
-                    mockedServer.factory().newInstance().create()
-            );
-        } catch (ReflectiveOperationException e) {
-            throw new ParameterResolutionException(
-                    format("Can't create config with given factory %s", mockedServer.factory()),
-                    e
-            );
-        }
-
+        server = wiremockFactory.createServer(mockedServer);
         server.start();
 
+        CustomizationContext customizationContext = wiremockFactory.createContextBuilder().
+                parameterContext(parameterContext).
+                extensionContext(extensionContext).
+                build();
+
         try {
-            mockedServer.customizer().newInstance().customize(server);
-        } catch (ReflectiveOperationException e) {
+            wiremockFactory.createCustomizer(mockedServer).customize(server, customizationContext);
+        } catch (Exception e) {
             throw new ParameterResolutionException(
                     format("Can't customize server with given customizer %s", mockedServer.customizer()),
                     e
             );
         }
 
-        ExtensionContext.Store store = context.getStore(Namespace.create(WiremockResolver.class));
+        ExtensionContext.Store store = extensionContext.getStore(Namespace.create(WiremockResolver.class));
         store.put(WIREMOCK_PORT, server.port());
 
         log.info("Started wiremock server on localhost:{}", server.port());

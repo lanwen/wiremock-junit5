@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static ru.lanwen.wiremock.testlib.TicketEndpoint.X_TEST_METHOD_NAME_HEADER;
 import static ru.lanwen.wiremock.testlib.TicketEndpoint.X_TICKET_ID_HEADER;
 
 /**
@@ -32,6 +33,10 @@ class WiremockResolverTest {
         TicketApi api = TicketApi.connect(uri);
 
         Response response = api.create(new Eticket());
+        Collection<String> testMethodNames = response.headers().get(X_TEST_METHOD_NAME_HEADER);
+        assertThat("testMethodNames", testMethodNames, hasSize(1));
+        assertThat("shouldCreateTicket", is(testMethodNames.iterator().next()));
+
         Collection<String> ids = response.headers().get(X_TICKET_ID_HEADER);
 
         assertThat("ids", ids, hasSize(1));
