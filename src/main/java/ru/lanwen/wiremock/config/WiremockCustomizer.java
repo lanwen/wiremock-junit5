@@ -12,11 +12,11 @@ import ru.lanwen.wiremock.ext.WiremockResolver;
  */
 public interface WiremockCustomizer {
 
-    default void customize(WireMockServer server) throws Exception {
+    default void customize(WireMockServer server) throws WiremockCustomizerException {
         // noop
     }
 
-    default void customize(WireMockServer server, CustomizationContext ctx) throws Exception {
+    default void customize(WireMockServer server, CustomizationContext ctx) throws WiremockCustomizerException {
         customize(server);
     }
 

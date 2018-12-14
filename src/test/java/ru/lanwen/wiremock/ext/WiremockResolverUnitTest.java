@@ -12,17 +12,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.CustomizationContext.CustomizationContextBuilder;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
+import ru.lanwen.wiremock.config.WiremockCustomizerException;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import java.lang.reflect.Parameter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_ALL;
+import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_EACH;
 
 /**
  * @author SourcePond (Roland Hauser)
@@ -70,9 +69,62 @@ public class WiremockResolverUnitTest {
     }
 
     @Test
-    public void afterEachServerIsNull() throws Exception {
+    public void afterEachStopServerIsNull() {
+        // set server directly avoiding to call method resolver.resolveParameter()
+        resolver.server = server;
         resolver.afterEach(extensionContext);
         verifyZeroInteractions(extensionContext);
+        verifyZeroInteractions(server);
+    }
+
+    @Test
+    public void afterEachServerIsNull() {
+        resolver.stopServer = AFTER_EACH;
+        resolver.afterEach(extensionContext);
+        verifyZeroInteractions(extensionContext);
+    }
+
+    @Test
+    public void afterEachServerWhenNotNullButNotRunning() {
+        when(server.isRunning()).thenReturn(false);
+
+        // set server and stopServer directly avoiding to call method resolver.resolveParameter()
+        resolver.server = server;
+        resolver.stopServer = AFTER_EACH;
+
+        resolver.afterEach(extensionContext);
+        verifyZeroInteractions(extensionContext);
+        verify(server).isRunning();
+    }
+
+    @Test
+    public void afterAllServerIsNull() {
+        resolver.stopServer = AFTER_ALL;
+        resolver.afterAll(extensionContext);
+        verifyZeroInteractions(extensionContext);
+    }
+
+
+    @Test
+    public void afterAllStopServerIsNull() {
+        // set server directly avoiding to call method resolver.resolveParameter()
+        resolver.server = server;
+        resolver.afterAll(extensionContext);
+        verifyZeroInteractions(extensionContext);
+        verifyZeroInteractions(server);
+    }
+
+    @Test
+    public void afterAllServerWhenNotNullButNotRunning() {
+        when(server.isRunning()).thenReturn(false);
+
+        // set server and stopServer directly avoiding to call method resolver.resolveParameter()
+        resolver.server = server;
+        resolver.stopServer = AFTER_ALL;
+
+        resolver.afterAll(extensionContext);
+        verifyZeroInteractions(extensionContext);
+        verify(server).isRunning();
     }
 
 
@@ -96,7 +148,7 @@ public class WiremockResolverUnitTest {
         when(customizationContextBuilder.build()).thenReturn(customizationContext);
         when(parameterContext.getParameter()).thenReturn(serverParameter);
 
-        final Exception expected = new Exception();
+        final WiremockCustomizerException expected = new WiremockCustomizerException();
         doThrow(expected).when(customizer).customize(server, customizationContext);
         try {
             resolver.resolveParameter(parameterContext, extensionContext);
