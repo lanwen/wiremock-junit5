@@ -11,9 +11,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
  * @author SourcePond (Roland Hauser)
  */
 public class NoopWiremockCustomizerTest {
-    private WireMockServer server = mock(WireMockServer.class);
-    private CustomizationContext customizable = mock(CustomizationContext.class);
-    private WiremockCustomizer customizer = new NoopWiremockCustomizer();
+    private final WireMockServer server = mock(WireMockServer.class);
+    private final CustomizationContext customizable = mock(CustomizationContext.class);
+    private final WiremockCustomizer customizer = new NoopWiremockCustomizer();
 
     @Test
     public void customize() throws Exception {

@@ -16,13 +16,9 @@ import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import java.lang.reflect.Parameter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author SourcePond (Roland Hauser)

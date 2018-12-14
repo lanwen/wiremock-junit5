@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author SourcePond (Roland Hauser)
  */
 public class DefaultWiremockConfigFactoryTest {
-    private DefaultWiremockConfigFactory factory = new DefaultWiremockConfigFactory();
+    private final DefaultWiremockConfigFactory factory = new DefaultWiremockConfigFactory();
 
     @Test
     public void create() {

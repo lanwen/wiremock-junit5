@@ -2,12 +2,8 @@ package ru.lanwen.wiremock.ext;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
 import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.WiremockConfigFactory;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
@@ -40,15 +36,13 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     }
 
     @Override
-    public void afterEach(ExtensionContext testExtensionContext) throws Exception {
-        if (server == null || !server.isRunning()) {
-            return;
+    public void afterEach(ExtensionContext testExtensionContext) {
+        if (server != null && server.isRunning()) {
+            server.resetRequests();
+            server.resetToDefaultMappings();
+            log.info("Stopping Wiremock server on localhost:{}", server.port());
+            server.stop();
         }
-
-        server.resetRequests();
-        server.resetToDefaultMappings();
-        log.info("Stopping wiremock server on localhost:{}", server.port());
-        server.stop();
     }
 
     @Override
@@ -68,10 +62,10 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
         server = wiremockFactory.createServer(mockedServer);
         server.start();
 
-        CustomizationContext customizationContext = wiremockFactory.createContextBuilder().
-                parameterContext(parameterContext).
-                extensionContext(extensionContext).
-                build();
+        CustomizationContext customizationContext = wiremockFactory.createContextBuilder()
+                .parameterContext(parameterContext)
+                .extensionContext(extensionContext)
+                .build();
 
         try {
             wiremockFactory.createCustomizer(mockedServer).customize(server, customizationContext);
@@ -85,12 +79,12 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
         ExtensionContext.Store store = extensionContext.getStore(Namespace.create(WiremockResolver.class));
         store.put(WIREMOCK_PORT, server.port());
 
-        log.info("Started wiremock server on localhost:{}", server.port());
+        log.info("Started Wiremock server on localhost:{}", server.port());
         return server;
     }
 
     /**
-     * Enables injection of wiremock server to test.
+     * Enables injection of Wiremock server to test.
      * Helps to configure instance with {@link #factory} and {@link #customizer} methods
      */
     @Target({ElementType.PARAMETER})

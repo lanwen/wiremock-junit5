@@ -14,12 +14,12 @@ import static ru.lanwen.wiremock.config.CustomizationContext.builder;
  * @author SourcePond (Roland Hauser)
  */
 public class CustomizationContextTest {
-    private ExtensionContext extensionContext = mock(ExtensionContext.class);
-    private ParameterContext parameterContext = mock(ParameterContext.class);
-    private CustomizationContext customizationContext = builder().
-            parameterContext(parameterContext).
-            extensionContext(extensionContext).
-            build();
+    private final ExtensionContext extensionContext = mock(ExtensionContext.class);
+    private final ParameterContext parameterContext = mock(ParameterContext.class);
+    private final CustomizationContext customizationContext = builder()
+            .parameterContext(parameterContext)
+            .extensionContext(extensionContext)
+            .build();
 
     @Test
     public void getExtensionContext() {
