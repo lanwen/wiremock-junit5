@@ -25,7 +25,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
     static final String WIREMOCK_PORT = "wiremock.port";
 
     private final WiremockFactory wiremockFactory;
-    private WireMockServer server;
+    protected WireMockServer server;
 
     public WiremockResolver() {
         this(new WiremockFactory());

@@ -71,6 +71,17 @@ public class WiremockResolverUnitTest {
         verifyZeroInteractions(extensionContext);
     }
 
+    @Test
+    public void afterEachServerWhenNotNullButNotRunning() throws Exception {
+        when(server.isRunning()).thenReturn(false);
+
+        // set server directly avoiding to call method resolver.resolveParameter()
+        resolver.server = server;
+
+        resolver.afterEach(extensionContext);
+        verifyZeroInteractions(extensionContext);
+        verify(server).isRunning();
+    }
 
     @Test
     public void supportsParameter() throws Exception {
