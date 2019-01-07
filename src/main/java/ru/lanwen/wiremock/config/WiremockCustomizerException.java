@@ -7,6 +7,6 @@ package ru.lanwen.wiremock.config;
  * @author Vincent Palau
  * @see WiremockCustomizer
  */
-public class WiremockCustomizerException extends RuntimeException {
+public class WiremockCustomizerException extends Exception {
 
 }
