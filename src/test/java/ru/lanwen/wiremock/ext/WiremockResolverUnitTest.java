@@ -20,8 +20,8 @@ import java.lang.reflect.Parameter;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
-import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_ALL;
-import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_EACH;
+import static ru.lanwen.wiremock.config.WiremockShutdownStrategy.AFTER_ALL;
+import static ru.lanwen.wiremock.config.WiremockShutdownStrategy.AFTER_EACH;
 
 /**
  * @author SourcePond (Roland Hauser)
@@ -79,7 +79,7 @@ public class WiremockResolverUnitTest {
 
     @Test
     public void afterEachServerIsNull() {
-        resolver.stopServer = AFTER_EACH;
+        resolver.shutdownStrategy = AFTER_EACH;
         resolver.afterEach(extensionContext);
         verifyZeroInteractions(extensionContext);
     }
@@ -88,9 +88,9 @@ public class WiremockResolverUnitTest {
     public void afterEachServerWhenNotNullButNotRunning() {
         when(server.isRunning()).thenReturn(false);
 
-        // set server and stopServer directly avoiding to call method resolver.resolveParameter()
+        // set server and shutdownStrategy directly avoiding to call method resolver.resolveParameter()
         resolver.server = server;
-        resolver.stopServer = AFTER_EACH;
+        resolver.shutdownStrategy = AFTER_EACH;
 
         resolver.afterEach(extensionContext);
         verifyZeroInteractions(extensionContext);
@@ -99,7 +99,7 @@ public class WiremockResolverUnitTest {
 
     @Test
     public void afterAllServerIsNull() {
-        resolver.stopServer = AFTER_ALL;
+        resolver.shutdownStrategy = AFTER_ALL;
         resolver.afterAll(extensionContext);
         verifyZeroInteractions(extensionContext);
     }
@@ -118,9 +118,9 @@ public class WiremockResolverUnitTest {
     public void afterAllServerWhenNotNullButNotRunning() {
         when(server.isRunning()).thenReturn(false);
 
-        // set server and stopServer directly avoiding to call method resolver.resolveParameter()
+        // set server and shutdownStrategy directly avoiding to call method resolver.resolveParameter()
         resolver.server = server;
-        resolver.stopServer = AFTER_ALL;
+        resolver.shutdownStrategy = AFTER_ALL;
 
         resolver.afterAll(extensionContext);
         verifyZeroInteractions(extensionContext);

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.WiremockConfigFactory;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
+import ru.lanwen.wiremock.config.WiremockShutdownStrategy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,9 +16,9 @@ import java.lang.annotation.Target;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static ru.lanwen.wiremock.config.WiremockShutdownStrategy.AFTER_ALL;
+import static ru.lanwen.wiremock.config.WiremockShutdownStrategy.AFTER_EACH;
 import static ru.lanwen.wiremock.ext.Validate.validState;
-import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_ALL;
-import static ru.lanwen.wiremock.ext.WiremockResolver.Wiremock.StopServer.AFTER_EACH;
 
 /**
  * @author lanwen (Merkushev Kirill)
@@ -28,7 +29,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback, A
 
     private final WiremockFactory wiremockFactory;
     protected WireMockServer server;
-    protected Wiremock.StopServer stopServer;
+    protected WiremockShutdownStrategy shutdownStrategy;
 
     public WiremockResolver() {
         this(new WiremockFactory());
@@ -40,14 +41,14 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback, A
 
     @Override
     public void afterEach(ExtensionContext testExtensionContext) {
-        if (AFTER_EACH == stopServer) {
+        if (AFTER_EACH == shutdownStrategy) {
             stopServerWhenIsRunning();
         }
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        if (AFTER_ALL == stopServer) {
+        if (AFTER_ALL == shutdownStrategy) {
             stopServerWhenIsRunning();
         }
     }
@@ -75,7 +76,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback, A
 
         Wiremock mockedServer = parameterContext.getParameter().getAnnotation(Wiremock.class);
 
-        stopServer = mockedServer.stopserver();
+        shutdownStrategy = mockedServer.shutdownStrategy();
 
         server = wiremockFactory.createServer(mockedServer);
         server.start();
@@ -119,23 +120,8 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback, A
         Class<? extends WiremockCustomizer> customizer() default WiremockCustomizer.NoopWiremockCustomizer.class;
 
         /**
-         * @return whenever to stop the server: AFTER_EACH or AFTER_ALL
+         * @return whenever to shutdown the server: AFTER_EACH or AFTER_ALL
          */
-        StopServer stopserver() default AFTER_EACH;
-
-        /**
-         * Defines whenever to stop the server: AFTER_EACH or AFTER_ALL
-         */
-        enum StopServer {
-            /**
-             * Should stop the server after each test method has been invoked.
-             */
-            AFTER_EACH,
-
-            /**
-             * Should stop the server after all tests have been invoked.
-             */
-            AFTER_ALL
-        }
+        WiremockShutdownStrategy shutdownStrategy() default WiremockShutdownStrategy.AFTER_EACH;
     }
 }
