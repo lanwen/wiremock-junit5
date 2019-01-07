@@ -2,8 +2,12 @@ package ru.lanwen.wiremock.ext;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import ru.lanwen.wiremock.config.CustomizationContext;
 import ru.lanwen.wiremock.config.WiremockConfigFactory;
 import ru.lanwen.wiremock.config.WiremockCustomizer;
@@ -37,12 +41,14 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
 
     @Override
     public void afterEach(ExtensionContext testExtensionContext) {
-        if (server != null && server.isRunning()) {
-            server.resetRequests();
-            server.resetToDefaultMappings();
-            log.info("Stopping Wiremock server on localhost:{}", server.port());
-            server.stop();
+        if (server == null || !server.isRunning()) {
+            return;
         }
+
+        server.resetRequests();
+        server.resetToDefaultMappings();
+        log.info("Stopping Wiremock server on localhost:{}", server.port());
+        server.stop();
     }
 
     @Override

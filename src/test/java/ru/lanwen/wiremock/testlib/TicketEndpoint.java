@@ -7,7 +7,10 @@ import ru.lanwen.wiremock.config.WiremockCustomizer;
 
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.lang.String.format;
 
 /**
@@ -22,7 +25,7 @@ public class TicketEndpoint implements WiremockCustomizer {
     public void customize(WireMockServer server, CustomizationContext customizationContext) {
         ExtensionContext context = customizationContext.getExtensionContext();
         String uuid = UUID.randomUUID().toString();
-        String testMethodName = context.getTestMethod().orElseThrow(IllegalStateException::new).getName();
+        String testMethodName = context.getTestMethod().get().getName();
 
         server.stubFor(
                 post(urlPathEqualTo("/ticket"))

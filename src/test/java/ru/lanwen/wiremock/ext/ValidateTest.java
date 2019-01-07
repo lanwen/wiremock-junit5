@@ -15,7 +15,7 @@ public class ValidateTest {
     private static final String EXPECTED_MESSAGE = "Expected message";
 
     @Test
-    public void instantiationNotAllowed() {
+    void instantiationNotAllowed() {
         assertThrows(UnsupportedOperationException.class, () -> {
             Constructor<Validate> constructor = Validate.class.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -28,7 +28,7 @@ public class ValidateTest {
     }
 
     @Test
-    public void verifyValidState() {
+    void verifyValidState() {
         // Should not throw an exception
         validState(true, EXPECTED_MESSAGE);
         assertThrows(IllegalStateException.class, () -> validState(false, EXPECTED_MESSAGE), EXPECTED_MESSAGE);

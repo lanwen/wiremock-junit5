@@ -1,7 +1,11 @@
 package ru.lanwen.wiremock.testlib;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.*;
+import feign.Feign;
+import feign.Logger;
+import feign.Param;
+import feign.RequestLine;
+import feign.Response;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;

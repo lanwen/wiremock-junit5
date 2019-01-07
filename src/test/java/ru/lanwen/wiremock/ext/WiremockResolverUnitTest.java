@@ -16,9 +16,14 @@ import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import java.lang.reflect.Parameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author SourcePond (Roland Hauser)
@@ -53,26 +58,26 @@ public class WiremockResolverUnitTest {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         serverParameter = getClass().getDeclaredMethod("supportedMethod", WireMockServer.class).getParameters()[0];
         mockedServer = serverParameter.getAnnotation(Wiremock.class);
         resolver = new WiremockResolver(wiremockFactory);
     }
 
     @Test
-    public void verifyDefaultConstructor() {
+    void verifyDefaultConstructor() {
         // Make code coverage happy
         new WiremockResolver();
     }
 
     @Test
-    public void afterEachServerIsNull() throws Exception {
+    void afterEachServerIsNull() throws Exception {
         resolver.afterEach(extensionContext);
         verifyZeroInteractions(extensionContext);
     }
 
     @Test
-    public void afterEachServerWhenNotNullButNotRunning() throws Exception {
+    void afterEachServerWhenNotNullButNotRunning() throws Exception {
         when(server.isRunning()).thenReturn(false);
 
         // set server directly avoiding to call method resolver.resolveParameter()
@@ -84,7 +89,7 @@ public class WiremockResolverUnitTest {
     }
 
     @Test
-    public void supportsParameter() throws Exception {
+    void supportsParameter() throws Exception {
         when(parameterContext.getParameter()).thenReturn(serverParameter);
 
         assertTrue(resolver.supportsParameter(parameterContext, extensionContext));
@@ -94,7 +99,7 @@ public class WiremockResolverUnitTest {
     }
 
     @Test
-    public void resolveParameterFailed() throws Exception {
+    void resolveParameterFailed() throws Exception {
         when(wiremockFactory.createServer(mockedServer)).thenReturn(server);
         when(wiremockFactory.createContextBuilder()).thenReturn(customizationContextBuilder);
         when(wiremockFactory.createCustomizer(mockedServer)).thenReturn(customizer);

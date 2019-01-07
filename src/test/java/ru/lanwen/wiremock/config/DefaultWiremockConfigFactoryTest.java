@@ -14,7 +14,7 @@ public class DefaultWiremockConfigFactoryTest {
     private final DefaultWiremockConfigFactory factory = new DefaultWiremockConfigFactory();
 
     @Test
-    public void create() {
+    void create() {
         WireMockConfiguration config = factory.create();
         assertEquals(0, config.portNumber());
         assertEquals(Slf4jNotifier.class, config.notifier().getClass());

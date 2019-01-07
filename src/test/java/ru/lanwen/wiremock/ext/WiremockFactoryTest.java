@@ -11,7 +11,10 @@ import ru.lanwen.wiremock.config.WiremockCustomizer;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,13 +54,13 @@ public class WiremockFactoryTest {
     private final WiremockFactory factory = new WiremockFactory();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         when(mockedServer.factory()).thenReturn((Class) StubClass.class);
         when(mockedServer.customizer()).thenReturn((Class) StubClass.class);
     }
 
     @Test
-    public void createServer() {
+    void createServer() {
         WireMockServer srv1 = factory.createServer(mockedServer);
         WireMockServer srv2 = factory.createServer(mockedServer);
         assertNotNull(srv1);
@@ -68,7 +71,7 @@ public class WiremockFactoryTest {
     }
 
     @Test
-    public void configFactoryCouldNotBeInstantiated() {
+    void configFactoryCouldNotBeInstantiated() {
         when(mockedServer.factory()).thenReturn((Class) PrivateClassNotAllowed.class);
         assertThrows(ParameterResolutionException.class,
                 () -> factory.createServer(mockedServer),
@@ -76,7 +79,7 @@ public class WiremockFactoryTest {
     }
 
     @Test
-    public void createContextBuilder() {
+    void createContextBuilder() {
         CustomizationContextBuilder builder1 = factory.createContextBuilder();
         CustomizationContextBuilder builder2 = factory.createContextBuilder();
         assertNotNull(builder1);
@@ -85,7 +88,7 @@ public class WiremockFactoryTest {
     }
 
     @Test
-    public void createCustomizer() {
+    void createCustomizer() {
         WiremockCustomizer customizer1 = factory.createCustomizer(mockedServer);
         WiremockCustomizer customizer2 = factory.createCustomizer(mockedServer);
         assertNotNull(customizer1);
@@ -94,7 +97,7 @@ public class WiremockFactoryTest {
     }
 
     @Test
-    public void customizerCouldNotBeInstantiated() {
+    void customizerCouldNotBeInstantiated() {
         when(mockedServer.customizer()).thenReturn((Class) PrivateClassNotAllowed.class);
         assertThrows(ParameterResolutionException.class,
                 () -> factory.createCustomizer(mockedServer),
