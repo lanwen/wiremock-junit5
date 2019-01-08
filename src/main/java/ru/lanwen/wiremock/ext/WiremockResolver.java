@@ -48,24 +48,26 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback, A
     @Override
     public void afterEach(ExtensionContext testExtensionContext) {
         if (AFTER_EACH == shutdownStrategy) {
-            stopServerWhenIsRunning();
+            shutdownServerWhenIsRunning();
         }
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
         if (AFTER_ALL == shutdownStrategy) {
-            stopServerWhenIsRunning();
+            shutdownServerWhenIsRunning();
         }
     }
 
-    private void stopServerWhenIsRunning() {
-        if (server != null && server.isRunning()) {
-            server.resetRequests();
-            server.resetToDefaultMappings();
-            log.info("Stopping Wiremock server on localhost:{}", server.port());
-            server.stop();
+    private void shutdownServerWhenIsRunning() {
+        if (server == null || !server.isRunning()) {
+            return;
         }
+
+        server.resetRequests();
+        server.resetToDefaultMappings();
+        log.info("Stopping Wiremock server on localhost:{}", server.port());
+        server.stop();
     }
 
     @Override
