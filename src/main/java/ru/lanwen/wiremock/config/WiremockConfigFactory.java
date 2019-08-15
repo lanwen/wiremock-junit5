@@ -3,6 +3,7 @@ package ru.lanwen.wiremock.config;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -20,18 +21,18 @@ public interface WiremockConfigFactory {
      *
      * @return config for wiremock
      */
-    WireMockConfiguration create();
+    default WireMockConfiguration create() {
+        return options().dynamicPort().notifier(new Slf4jNotifier(true));
+    }
+
+    default WireMockConfiguration create(ExtensionContext context) {
+        return create();
+    }
 
     /**
      * By default creates config with dynamic port only and notifier.
      */
-    class DefaultWiremockConfigFactory implements WiremockConfigFactory {
-
-        @Override
-        public WireMockConfiguration create() {
-            return options().dynamicPort().notifier(new Slf4jNotifier(true));
-        }
-    }
+    class DefaultWiremockConfigFactory implements WiremockConfigFactory {}
 
     /**
      * By default creates config with dynamic port only, notifier and Templating Response enabled.

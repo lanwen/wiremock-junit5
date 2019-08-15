@@ -88,7 +88,7 @@ public class WiremockResolverUnitTest {
 
     @Test
     public void resolveParameterFailed() throws Exception {
-        when(wiremockFactory.createServer(mockedServer)).thenReturn(server);
+        when(wiremockFactory.createServer(mockedServer, extensionContext)).thenReturn(server);
         when(wiremockFactory.createContextBuilder()).thenReturn(customizationContextBuilder);
         when(wiremockFactory.createCustomizer(mockedServer)).thenReturn(customizer);
         when(customizationContextBuilder.extensionContext(extensionContext)).thenReturn(customizationContextBuilder);

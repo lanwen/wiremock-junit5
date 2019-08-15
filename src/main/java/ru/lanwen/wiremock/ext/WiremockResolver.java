@@ -65,7 +65,7 @@ public class WiremockResolver implements ParameterResolver, AfterEachCallback {
 
         Wiremock mockedServer = parameterContext.getParameter().getAnnotation(Wiremock.class);
 
-        server = wiremockFactory.createServer(mockedServer);
+        server = wiremockFactory.createServer(mockedServer, extensionContext);
         server.start();
 
         CustomizationContext customizationContext = wiremockFactory.createContextBuilder().
